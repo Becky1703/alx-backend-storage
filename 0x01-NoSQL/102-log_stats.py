@@ -16,6 +16,7 @@ def print_nginx_request_logs(nginx_collection):
         ))
         print('{} status check'.format(status_checks_count))
 
+
 def print_top_current_ips(server_collection):
     """Function prints the stats about the top 10 IPs in the
     nginx logs collection"""
@@ -37,13 +38,14 @@ def print_top_current_ips(server_collection):
         ip = request_log['_id']
         ip_requests_count = request_log['totalRequests']
         print('\t{}: {}'.format(ip, ip_requests_count))
-    
-        
+
+
 def run():
     """Function to run theprint_nginx_request_logs function"""
     client = MongoClient('mongodb://127.0.0.1:27017')
     print_nginx_request_logs(client.logs.nginx)
     print_top_current_ips(client.logs.nginx)
+
 
 if __name__ == '__main__':
     run()
