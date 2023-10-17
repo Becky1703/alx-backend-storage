@@ -1,0 +1,2 @@
+// Script creates or uses the database my_db in mongodb
+use my_db;
