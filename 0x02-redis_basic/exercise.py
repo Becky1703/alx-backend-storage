@@ -2,8 +2,20 @@
 """REdis Server"""
 import uuid
 import redis
-from typing import Union, Callable
+from functools import wraps
+from typing import Union, Callable, Any
 
+
+def count_calls(method: Callable) -> Callable:
+    """Function tracks the number of calls made to a method
+    in the Cache class"""
+    @wraps(method)
+    def invoker(self, *args, **kwargs) -> Any:
+        """method to invoke the given method after incrementing"""
+        if isinstance(self._redis, redis.Redis):
+            self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
+    return invoker
 
 class Cache():
     """Class Cache represents an object for storing data in a redis storage"""
@@ -12,6 +24,7 @@ class Cache():
         self._redis = redis.Redis()
         self._redis.flushdb(True)
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """Function stores a value in a Redis data storag and returns a key"""
         data_key = str(uuid.uuid4())
