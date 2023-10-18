@@ -3,7 +3,7 @@
 import redis
 import requests
 from functools import wraps
-from typing import Calllable
+from typing import Callable
 
 # redis instance
 redis_store = redis.Redis()
