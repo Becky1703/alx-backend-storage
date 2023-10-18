@@ -1,39 +1,26 @@
-#!/usr/bin/env python3
-"""Script analyses Nginx log"""
-import pymongo
+#!/usr/bin/env python3                                                                                
+"""Script analyses Nginx logs stored in Mongodb"""
+from pymongo import MongoClient
 
 
 def print_nginx_request_logs(nginx_collection):
     """Function prints stats about Nginx requet logs"""
-# MongoDB connection details
-mongo_uri = "mongodb://localhost:27017/"  # Replace with your MongoDB URI
-db_name = "logs"
-collection_name = "nginx"
+    print('{} logs'.format(nginx_collection.count_documents({})))
+    print('Methods:')
+    methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+    for method in methods:
+        req_count = len(list(nginx_collection.find({'method': method})))
+        print('\tmethod {}: {}'.format(method, req_count))
+        status_checks_count = len(list(
+            nginx_collection.find({'method': 'GET', 'path': '/status'})
+        ))
+        print(status_checks_count, "status_check")
 
-# Connect to MongoDB
-client = pymongo.MongoClient(mongo_uri)
-db = client[db_name]
-collection = db[collection_name]
 
-# Get the total number of documents
-total_logs = collection.count_documents({})
+def run():
+    """Function to run theprint_nginx_request_logs function"""
+    client = MongoClient('mongodb://127.0.0.1:27017')
+    print_nginx_request_logs(client.logs.nginx)
 
-# Count documents with specific methods
-methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-method_counts = {}
-for method in methods:
-    count = collection.count_documents({"method": method})
-    method_counts[method] = count
-
-# Count documents with specific method and path
-status_check_count = collection.count_documents({"method": "GET", "path": "/status"})
-
-# Display the results
-print(f"{total_logs} logs")
-print("Methods:")
-for method, count in method_counts.items():
-    print(f"    method {method}: {count}")
-print(status_check_count, "status check")
-
-# Close the MongoDB connection
-client.close()
+if __name__ == "__main__":
+    run()
