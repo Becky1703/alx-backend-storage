@@ -17,6 +17,7 @@ def count_calls(method: Callable) -> Callable:
         return method(self, *args, **kwargs)
     return invoker
 
+
 def call_history(method: Callable) -> Callable:
     """Function tracks the call details of a method in a cache class"""
     @wraps(method)
@@ -24,7 +25,7 @@ def call_history(method: Callable) -> Callable:
         """Function eturns methods's output after storing its inputs and
         outputs"""
         in_key = '{}:inputs'.format(method.__qualname__)
-        out_key ='{}:outputs'.format(method.__qualname__)
+        out_key = '{}:outputs'.format(method.__qualname__)
         if isinstance(self._redis, redis.Redis):
             self._redis.rpush(in_key, str(args))
         output = method(self, *args, **kwargs)
@@ -42,7 +43,7 @@ def replay(fn: Callable) -> None:
     if not isinstance(redis_store, redis.Redis):
         return
     fxn_name = fn.__qualname__
-    in_key ='{}:inputs'.format(fxn_name)
+    in_key = '{}:inputs'.format(fxn_name)
     out_key = '{}:outputs'.format(fxn_name)
     fxn_call_count = 0
     if redis_store.exists(fxn_name) != 0:
@@ -56,6 +57,7 @@ def replay(fn: Callable) -> None:
             fxn_input.decode("utf-8"),
             fxn_output,
         ))
+
 
 class Cache():
     """Class Cache represents an object for storing data in a redis storage"""
